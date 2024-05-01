@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <if condition='isDefined("LOKI")'>
+        <then>
+            <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+                <http>
+                    <url>${LOKI}/loki/api/v1/push</url>
+                </http>
+                <format>
+                    <label>
+                        <pattern>app=country-city-service,host=${HOSTNAME},level=%level</pattern>
+                    </label>
+                </format>
+                <message>
+                    <pattern>%-5level [%.5(${HOSTNAME})] %.10thread %logger{20} | %msg %exx</pattern>
+                </message>
+                <sortByTime>true</sortByTime>
+            </appender>
+        </then>
+
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="LOKI"/>
+        </root>
+        <else>
+            <root level="info">
+                <appender-ref ref="CONSOLE"/>
+            </root>
+        </else>
+    </if>
+
+</configuration>

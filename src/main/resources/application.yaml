@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: country-city-service
+  security:
+    public-urls: /actuator/**,/swagger-ui/**,/v3/api-docs/**,/swagger-ui.html,/api/v1/auth/**
+  datasource:
+    url: jdbc:postgresql://localhost:5433/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  cloud:
+    aws:
+      s3:
+        endpoint: ${S3.URL}
+        region: ${S3.REGION}
+        bucket: ${S3.BUCKET.NAME}
+      credentials:
+        access-key: ${S3.ACCESS.KEY}
+        secret-key: ${S3.SECRET.KEY}
+      region:
+        static: ${S3.REGION}
+  liquibase:
+    change-log: db/changelog/db.changelog-master.yaml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info,metric
+jwt:
+  secret:
+    key:
+      hex: ${JWT.SECRET.KEY}
+
+springdoc:
+  show-actuator: true

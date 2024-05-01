@@ -1,0 +1,30 @@
+services:
+  db:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=country-city-db'
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'POSTGRES_USER=postgres'
+    ports:
+      - '5433:5432'
+
+  localstack:
+    image: localstack/localstack
+    ports:
+      - '4566:4566' # LocalStack endpoint
+
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - ./localstack-script:/etc/localstack/init/ready.d
+      - '/var/run/docker.sock:/var/run/docker.sock'
+
+  loki-logs-aggregation:
+    image: grafana/loki:2.9.4
+    ports:
+      - '3100:3100'
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - '3000:3000'

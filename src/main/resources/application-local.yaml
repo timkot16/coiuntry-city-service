@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/country-city-db
+    username: postgres
+    password: postgres
+  cloud:
+    aws:
+      s3:
+        endpoint: http://s3.localhost.localstack.cloud:4566
+        region: eu-central-1
+        bucket: city-logo-bucket
+      credentials:
+        access-key: none
+        secret-key: none
+      region:
+        static: eu-central-1
+
+jwt:
+  secret:
+    key:
+      hex: 25432A46294A404E635266556A586E3272357538782F413F4428472B4B615064
