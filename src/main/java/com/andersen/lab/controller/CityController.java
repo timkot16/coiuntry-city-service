@@ -30,11 +30,11 @@ public class CityController {
     CityService cityService;
 
     @GetMapping
-    public ResponseEntity<List<City>> getAll(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<City>> getAll(@RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<City> cities = cityService.getAll(pageable);
-        return ResponseEntity.ok().body(cities.getContent());
+        return ResponseEntity.ok().body(cities);
     }
 
     @GetMapping("/unique")

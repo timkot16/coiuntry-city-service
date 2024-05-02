@@ -39,5 +39,6 @@ jwt:
     key:
       hex: ${JWT.SECRET.KEY}
 
-springdoc:
-  show-actuator: true
+logging:
+  level:
+    org.springframework.security: DEBUG

@@ -8,6 +8,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -36,6 +38,7 @@ public class CountryService {
 
     @Transactional
     public Country save(Country country) {
+        log.info("Try to save new county with name [{}]", country.name());
         CountryEntity newCountryEntity = countryMapper.toEntity(country);
         CountryEntity countryEntity = countryRepository.save(newCountryEntity);
         return countryMapper.toDto(countryEntity);
@@ -43,6 +46,7 @@ public class CountryService {
 
     @Transactional
     public List<Country> saveAll(List<Country> countries) {
+        log.info("Try to save batch of counties [{}]", countries.toString());
         List<CountryEntity> newCountryEntities = countryMapper.toEntityList(countries);
         List<CountryEntity> countryEntities = countryRepository.saveAll(newCountryEntities);
         return countryMapper.toDtoList(countryEntities);
@@ -50,6 +54,7 @@ public class CountryService {
 
     @Transactional
     public void edit(Long id, Country country) {
+        log.info("Try to edit country [{}]", country.name());
         Optional<CountryEntity> optionalCountryEntity = countryRepository.findById(id);
         if (optionalCountryEntity.isPresent()) {
             CountryEntity countryEntity = optionalCountryEntity.get();

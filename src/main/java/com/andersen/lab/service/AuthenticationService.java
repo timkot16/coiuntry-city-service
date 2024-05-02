@@ -8,6 +8,7 @@ import com.andersen.lab.model.AuthenticationRequest;
 import com.andersen.lab.model.AuthenticationResponse;
 import com.andersen.lab.model.RegisterRequest;
 import com.andersen.lab.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +30,13 @@ public class AuthenticationService {
     UserMapper userMapper;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        log.debug("Try to authenticate user with email [{}]", request.email());
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
         UserEntity userEntity = userRepository.findByEmail(request.email())
-                .orElseThrow();
+                .orElseThrow(EntityNotFoundException::new);
+        log.debug("User with email [{}] successfully authenticated", request.email());
         String jwtToken = jwtService.generateToken(userEntity);
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
@@ -45,8 +48,10 @@ public class AuthenticationService {
                     log.warn("User with email [{}] already exist.", request.email());
                     throw new RegistrationException("Registration failed. Please check your data and try again.");
                 });
+        log.debug("Try to register user with email [{}]", request.email());
         UserEntity userEntity = userMapper.toEntity(request);
         UserEntity newUserEntity = userRepository.save(userEntity);
+        log.debug("User with email [{}] successfully registered", newUserEntity.getEmail());
         String jwtToken = jwtService.generateToken(newUserEntity);
         return AuthenticationResponse.builder().token(jwtToken).build();
     }

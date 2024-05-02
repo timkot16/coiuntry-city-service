@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -30,15 +32,18 @@ public class CityService {
     S3Service s3Service;
 
     public Page<City> getAll(Pageable pageable) {
+        log.info("Try to get all cities with pagination");
         return cityRepository.findAll(pageable)
                 .map(cityMapper::toDto);
     }
 
     public List<String> getAllUniqueNames() {
+        log.info("Try to get all only unique cities names");
         return cityRepository.findAllUniqueCityNames();
     }
 
     public List<City> getAllByCountryName(String countryName) {
+        log.info("Try to get all cities by country name");
         CountryEntity countryEntity = countryService.getByName(countryName);
         return cityRepository.findAllByCountryEntityId(countryEntity.getId()).stream()
                 .map(cityMapper::toDto)
@@ -46,6 +51,7 @@ public class CityService {
     }
 
     public List<City> getAllByName(String cityName) {
+        log.info("Try to get all cities by city name");
         return cityRepository.findAllByName(cityName).stream()
                 .map(cityMapper::toDto)
                 .toList();
@@ -54,6 +60,7 @@ public class CityService {
     @SneakyThrows
     @Transactional
     public void edit(Long cityId, City city, MultipartFile logo) {
+        log.info("Try to edit city with id [{}] and name [{}]", cityId, city.cityName());
         cityRepository.findById(cityId)
                 .ifPresent(cityEntity -> {
                     cityEntity.setName(city.cityName());
@@ -70,6 +77,7 @@ public class CityService {
 
     @Transactional
     public City save(City city, MultipartFile logo) {
+        log.info("Try to save city with name [{}]", city.cityName());
         CountryEntity countryEntity = countryService.getByName(city.country().name());
         CityEntity cityEntity = cityMapper.toEntity(city, countryEntity);
         saveLogoIfExist(logo, cityEntity);
@@ -79,6 +87,7 @@ public class CityService {
 
     @SneakyThrows
     public byte[] getLogo(Long cityId) {
+        log.info("Try to get logo by city id [{}]", cityId);
         return cityRepository.findById(cityId)
                 .map(CityEntity::getLogoId)
                 .map(uuid -> s3Service.getContent(uuid.toString()))
